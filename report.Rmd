@@ -1,0 +1,110 @@
+---
+title: "Report"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = F)
+source("01_load.R")
+
+```
+
+# Last Games
+
+```{r}
+ games %>%
+  filter(!is.na(home_score)) %>%
+  filter(date <= Sys.Date()) %>%
+  slice_max(date, n = 10) %>%
+  knitr::kable()
+```
+
+# Next Games
+
+```{r}
+ games %>%
+  filter(date >= Sys.Date()) %>%
+  slice_min(date, n = 10) %>%
+  knitr::kable()
+```
+
+\newpage
+
+# Overall Standings
+
+```{r}
+standings %>%
+  print_standings() %>% 
+  knitr::kable()
+```
+
+# SOS vs Avg Net Runs
+
+```{r}
+standings %>% 
+    ggplot(aes(x = sos, y = avg_runs_net_regular, label = team)) + 
+      geom_point(aes( color=division)) + 
+      geom_hline(yintercept = 0.0, alpha = 0.5) + 
+      geom_vline(xintercept = 0.5, alpha = 0.5) + 
+      geom_text_repel() + 
+      labs(
+        x = 'Strength of Schedule', 
+        y = 'Avg Net Runs per Game',
+        title = 'SOS vs Avg Net Runs'
+      )
+      
+```
+
+
+\newpage
+
+# Divisions
+
+```{r}
+standings %>%
+  group_by(division) %>%
+  summarise(
+    Runs = sum(runs_for_regular),
+    "Runs per Game" = Runs/sum(gp)
+  ) %>% 
+  knitr::kable()
+```
+
+\newpage
+
+## Altuve
+
+
+```{r}
+standings %>%
+  filter(division == 'altuve') %>%
+  print_standings() %>% 
+  knitr::kable()
+```
+
+```{r}
+```
+
+
+\newpage
+
+## Bregman
+
+```{r}
+standings %>%
+  filter(division == 'bregman') %>%
+  print_standings() %>% 
+  knitr::kable()
+```
+
+\newpage
+
+## Correa
+
+```{r}
+standings %>%
+  filter(division == 'correa') %>%
+  print_standings() %>% 
+  knitr::kable()
+```
+
