@@ -10,9 +10,22 @@ games <- games_raw %>%
     date = parse_date(paste0(date,"/2021"), '%a %m/%d/%Y')
   ) 
 
+
 # ELO Calculations
-e = elo.run(score(home_score, away_score) ~ home_team + away_team, data = games, k = 60)
+e = elo.run(score(home_score, away_score) ~ home_team + away_team, 
+            data = games, 
+            subset = home_score != away_score, 
+            k = 90,
+            skip = 2)
+summary(e)
 elo_data <- as.data.frame(e)
+
+# add predictions
+games <- games %>%
+  # rowwise %>%
+  mutate(
+    p = predict(e, newdata = data.frame(home_team = home_team, away_team = away_team))
+  )
 
 standings <- standings_raw %>%
   mutate(
@@ -89,12 +102,18 @@ standings <- standings %>%
     sos = calc_sos(team)$pct
  )
 
+elo_ranking = tibble::rownames_to_column(as.data.frame(final.elos(e)), "team") %>%
+  rename(elo_rating = 'final.elos(e)') %>%
+  mutate(rank = dense_rank(desc(elo_rating)))
+
 standings <- standings %>%
-   left_join(
-     team_game_stats
-   ) %>%
-   mutate(
+  left_join(
+    team_game_stats
+  ) %>%
+  left_join(
+    elo_ranking
+  ) %>%
+  mutate(
     team = as.factor(team),
-     division = as.factor(division)
-   )
- 
+    division = as.factor(division)
+  )

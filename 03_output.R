@@ -15,7 +15,9 @@ print_standings <- function(data) {
     "aRF" = avg_runs_for_regular, 
     "aRA" = avg_runs_against_regular, 
     "aNet" = avg_runs_net_regular,
-    "SOS" = sos
+    "SOS" = sos,
+    'Elo Rating' = elo_rating,
+    'Elo Rank' = rank
     )
 }
 

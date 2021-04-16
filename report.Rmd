@@ -1,6 +1,7 @@
 ---
 title: "Report"
 output: pdf_document
+classoption: landscape
 ---
 
 ```{r setup, include=FALSE}
@@ -43,7 +44,7 @@ standings %>%
 ```{r}
 standings %>% 
     ggplot(aes(x = sos, y = avg_runs_net_regular, label = team)) + 
-      geom_point(aes( color=division)) + 
+      geom_point(aes(color=division,size = elo_rating)) + 
       geom_hline(yintercept = 0.0, alpha = 0.5) + 
       geom_vline(xintercept = 0.5, alpha = 0.5) + 
       geom_text_repel() + 
